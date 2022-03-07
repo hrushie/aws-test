@@ -24,7 +24,7 @@ pipeline {
     }
     stage('Docker Build') {
       steps {
-        sh 'docker build --no-cache --build-arg GIT_COMMIT=$COMMIT_ID -t helloworld:$COMMIT_ID -t $AWS_ECR_URI/helloworld:$COMMIT_ID .'
+        sh 'docker build --no-cache --build-arg GIT_COMMIT=$COMMIT_ID -t helloworld:$GIT_COMMIT -t $AWS_ECR_URI/helloworld:$GIT_COMMIT .'
         }
     }
     stage('Docker Push') {
