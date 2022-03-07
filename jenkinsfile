@@ -6,29 +6,36 @@ pipeline {
   parameters {
     choice choices: ['dev', 'prod'], description: 'Choose the type of deplopymemt', name: 'deployment'
   }
+  environment {
+        AWS_ECR_URI = '310228935478.dkr.ecr.us-west-2.amazonaws.com'
+        NAMESPACE = 'Rushi'
+      } 
   stages {
     stage('Pre Build') {
       steps {
         cleanWs()
         sshagent(['hrushie_key']) {
             sh 'git clone git@github.com:hrushie/aws-test.git $WORKSPACE'
-
+            sh 'aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $AWS_ECR_URI'
+            sh 'aws eks update-kubeconfig --region us-west-2 --name at-interviews-cluster'
         }  
       }
     }
     stage('Docker Build') {
       steps {
-        sh 'docker --version'
+        sh 'docker build --no-cache --build-arg GIT_COMMIT=$COMMIT_ID -t helloworld:$COMMIT_ID -t $AWS_ECR_URI/helloworld:$COMMIT_ID .'
         }
     }
     stage('Docker Push') {
       steps {
-        sh 'aws --version'
+        sh 'docker push AWS_ECR_URI/helloworld:$COMMIT_ID'
       }
     }
     stage('Deploy') {
       steps {
-          sh 'helm version'
+          sh '''
+          helm upgrade --install --namespace $NAMESPACE-$deployment --create-namespace helloworld --set image.tag=$COMMIT_ID helm/helloworld
+          '''
       }
     }
   }
