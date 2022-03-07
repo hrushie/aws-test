@@ -29,7 +29,7 @@ pipeline {
     }
     stage('Docker Push') {
       steps {
-        sh 'docker push AWS_ECR_URI/helloworld:$GIT_HASH'
+        sh 'docker push $AWS_ECR_URI/helloworld:$GIT_HASH'
       }
     }
     stage('Deploy') {
