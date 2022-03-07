@@ -8,7 +8,7 @@ pipeline {
   }
   environment {
         AWS_ECR_URI = '310228935478.dkr.ecr.us-west-2.amazonaws.com'
-        NAMESPACE = 'Rushi'
+        NAMESPACE = 'rushikesh'
         GIT_HASH = GIT_COMMIT.take(7)
       } 
   stages {
