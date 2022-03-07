@@ -17,7 +17,6 @@ pipeline {
         cleanWs()
         sshagent(['hrushie_key']) {
             sh 'git clone git@github.com:hrushie/aws-test.git $WORKSPACE'
-            sh 'export COMMIT_ID=$(git rev-parse --verify --short HEAD)'
             sh 'aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $AWS_ECR_URI'
             sh 'aws eks update-kubeconfig --region us-west-2 --name at-interviews-cluster'
         }  
@@ -30,13 +29,13 @@ pipeline {
     }
     stage('Docker Push') {
       steps {
-        sh 'docker push AWS_ECR_URI/helloworld:$COMMIT_ID'
+        sh 'docker push AWS_ECR_URI/helloworld:$GIT_HASH'
       }
     }
     stage('Deploy') {
       steps {
           sh '''
-          helm upgrade --install --namespace $NAMESPACE-$deployment --create-namespace helloworld --set image.tag=$COMMIT_ID helm/helloworld
+          helm upgrade --install --namespace $NAMESPACE-$deployment --create-namespace helloworld --set image.tag=$GIT_HASH helm/helloworld
           '''
       }
     }
