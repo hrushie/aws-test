@@ -1,0 +1,33 @@
+pipeline {
+  agent any
+
+  options {
+    buildDiscarder logRotator(daysToKeepStr: '10', numToKeepStr: '5')
+  }
+  parameters {
+    choice choices: ['dev', 'prod'], description: 'Choose the type of deplopymemt', name: 'deployment'
+  }
+  stages {
+    stage('Checkout') {
+      steps {
+
+        sh 'git clone git@github.com:hrushie/aws-test.git $WORKSPACE'
+      }
+    }
+    stage('Docker Build') {
+      steps {
+        sh 'docker --version'
+        }
+    }
+    stage('Docker Push') {
+      steps {
+        sh 'aws --version'
+      }
+    }
+    stage('Deploy') {
+         sh 'helm version'
+      steps {
+      }
+    }
+  }
+}
