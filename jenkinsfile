@@ -1,6 +1,5 @@
 pipeline {
   agent any
-
   options {
     buildDiscarder logRotator(daysToKeepStr: '10', numToKeepStr: '5')
   }
@@ -8,9 +7,8 @@ pipeline {
     choice choices: ['dev', 'prod'], description: 'Choose the type of deplopymemt', name: 'deployment'
   }
   stages {
-    stage('Checkout') {
+    stage('Pre Build') {
       steps {
-
         sh 'git clone git@github.com:hrushie/aws-test.git $WORKSPACE'
       }
     }
@@ -25,8 +23,8 @@ pipeline {
       }
     }
     stage('Deploy') {
-         sh 'helm version'
       steps {
+          sh 'helm version'
       }
     }
   }
